@@ -1,2 +1,169 @@
-<h1>DevOps Day1 ✅</h1>
-<p>This is deployed by Jenkins!</p>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>猜猜是男是女</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;background:#0d0d1a;min-height:100vh;display:flex;justify-content:center;align-items:center;color:#eee}
+.container{background:#16162a;border:1px solid #2a2a4a;border-radius:24px;padding:32px;max-width:640px;width:94%;box-shadow:0 20px 60px rgba(0,0,0,.6);text-align:center}
+h1{font-size:26px;margin-bottom:4px;background:linear-gradient(90deg,#f7971e,#ffd200);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.sub{font-size:13px;color:#666;margin-bottom:20px}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;font-size:14px;color:#888}
+.top .c{font-weight:bold;color:#ffd200}
+.box{background:#0a0a18;border-radius:16px;overflow:hidden;margin-bottom:20px;position:relative;aspect-ratio:3/4;max-height:420px;display:flex;align-items:center;justify-content:center;border:1px solid #222}
+.box img{width:100%;height:100%;object-fit:cover;display:block;transition:opacity .3s}
+.box .ld{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#0a0a18;color:#555;font-size:14px;z-index:1;transition:opacity .3s}
+.box .ld.h{opacity:0;pointer-events:none}
+.sel{display:flex;gap:14px;margin-bottom:16px}
+.sel button{flex:1;padding:14px;font-size:20px;font-weight:bold;border:2px solid #333;border-radius:14px;background:#1e1e38;color:#ccc;cursor:pointer;transition:all .15s}
+.sel button:hover:not(:disabled){transform:translateY(-1px)}
+.sel button.m{border-color:#3a5a8a}
+.sel button.m:hover:not(:disabled){border-color:#4a8af4;color:#fff}
+.sel button.f{border-color:#8a3a5a}
+.sel button.f:hover:not(:disabled){border-color:#f472b6;color:#fff}
+.sel button:disabled{opacity:.35;cursor:default}
+.rd{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0;text-align:left;max-height:400px;overflow-y:auto}
+.ri{background:#12122a;border-radius:10px;padding:8px;display:flex;align-items:center;gap:8px;border:1px solid #252545;font-size:12px}
+.ri img{width:40px;height:40px;border-radius:6px;object-fit:cover;flex-shrink:0;background:#0a0a18}
+.ri .c{flex:1;min-width:0}
+.ri .n{font-weight:600;color:#ccc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ri .a{font-size:10px;color:#666;margin-top:1px}
+.ri .ic{font-size:18px;flex-shrink:0}
+.fs{text-align:center;padding:16px 0}
+.fs .b{font-size:60px;font-weight:bold;background:linear-gradient(90deg,#f7971e,#ffd200);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.fs .l{color:#888;font-size:15px;margin-top:4px}
+.fs .s{font-size:32px;margin:10px 0}
+.fs .m{color:#aaa;font-size:13px}
+.btn{padding:12px 40px;font-size:16px;font-weight:bold;border:none;border-radius:12px;cursor:pointer;transition:all .2s;margin-top:10px}
+.btn-p{background:linear-gradient(90deg,#f7971e,#ffd200);color:#1a1a2e}
+.btn-p:hover{transform:scale(1.04);box-shadow:0 6px 20px rgba(247,151,30,.3)}
+.pg{display:none}
+.pg.a{display:block}
+.ft{font-size:11px;color:#333;margin-top:16px}
+@keyframes fi{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.fi{animation:fi .3s ease-out}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="pg a" id="pp">
+<h1>🤔 猜猜是男是女</h1>
+<div class="sub">看真实人物照片，猜性别！</div>
+<div class="top"><span>第 <span class="c" id="qn">1</span> / <span id="qt">12</span> 题</span><span>✅ <span id="qk">0</span> ❌ <span id="qnok">0</span></span></div>
+<div class="box"><div class="ld" id="ld">⏳ 加载图片中...</div><img id="qi" src="" alt="人物照片"></div>
+<div class="sel"><button class="m" id="bm" onclick="a('male')">♂️ 男生</button><button class="f" id="bf" onclick="a('female')">♀️ 女生</button></div>
+</div>
+<div class="pg" id="rp">
+<h1>📊 揭晓答案</h1>
+<div class="sub">来看看你的直觉准不准</div>
+<div class="fs fi"><div class="b" id="fc">0</div><div class="l">/ <span id="ft">12</span> 题正确</div><div class="s" id="fs2">⭐⭐⭐</div><div class="m" id="fm"></div></div>
+<div class="rd" id="rg"></div>
+<button class="btn btn-p" onclick="r()">🔄 再来一局</button>
+</div>
+<div class="ft">图片存储在 /data/tupian/ 目录下</div>
+</div>
+<script>
+// ===== 图片列表（图片放在 /data/tupian/ 目录下）=====
+// 实际性别：female = 生理女性（但外表偏男性化）
+// 实际性别：male   = 生理男性（但外表偏女性化）
+const ALL = [
+  { n:"安妮·蓝妮克丝",   g:"female", f:"annie_lennox.jpg" },
+  { n:"蒂尔达·斯文顿",   g:"female", f:"tilda_swinton.jpg" },
+  { n:"鲁比·罗丝",       g:"female", f:"ruby_rose.jpg" },
+  { n:"凯蒂·莲",         g:"female", f:"kd_lang.jpg" },
+  { n:"格蕾丝·琼斯",     g:"female", f:"grace_jones.jpg" },
+  { n:"贾奈尔·梦内",     g:"female", f:"janelle_monae.jpg" },
+  { n:"金·普琳塞斯",     g:"female", f:"king_princess.jpg" },
+  { n:"艾伦·德杰尼勒斯", g:"female", f:"ellen_degeneres.jpg" },
+  { n:"克里斯汀·斯图尔特",g:"female", f:"kristen_stewart.jpg" },
+  { n:"埃丽卡·林德",     g:"female", f:"erika_linder.jpg" },
+  { n:"哈里·斯泰尔斯",   g:"male",   f:"harry_styles.jpg" },
+  { n:"王子",             g:"male",   f:"prince.jpg" },
+  { n:"大卫·鲍伊",       g:"male",   f:"david_bowie.jpg" },
+  { n:"布莱恩·莫尔科",   g:"male",   f:"brian_molko.jpg" },
+  { n:"乔治男孩",         g:"male",   f:"boy_george.jpg" },
+  { n:"彼得·伯恩斯",     g:"male",   f:"pete_burns.jpg" },
+  { n:"玛丽莲·曼森",     g:"male",   f:"marilyn_manson.jpg" },
+  { n:"杰弗里·斯塔",     g:"male",   f:"jeffree_star.jpg" },
+  { n:"雷恩·达夫",       g:"female", f:"rain_dove.jpg" },
+  { n:"阿维·罗克",       g:"male",   f:"avi_roque.jpg" }
+];
+
+const R=12;
+let po=[],an=[],cu=0,co=0,wr=0;
+
+function sh(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+
+function imgPath(name){return '/tupian/'+name}
+
+function it(){
+  po=sh([...ALL]).slice(0,R);
+  an=po.map(p=>({p:p,u:null}));
+  cu=0;co=0;wr=0;
+  document.getElementById('qt').textContent=R;
+  sp('pp');
+  sq();
+}
+
+function sq(){
+  if(cu>=R){sr();return}
+  const p=po[cu];
+  document.getElementById('qn').textContent=cu+1;
+  document.getElementById('qt').textContent=R;
+  document.getElementById('qk').textContent=co;
+  document.getElementById('qnok').textContent=wr;
+  const img=document.getElementById('qi');
+  const ld=document.getElementById('ld');
+  ld.classList.remove('h');
+  img.style.opacity='0';
+  img.src=imgPath(p.f);
+  img.onload=()=>{img.style.opacity='1';ld.classList.add('h')};
+  img.onerror=()=>{ld.textContent='⚠️ 图片 '+p.f+' 未找到，请检查 /data/tupian/ 目录';img.style.opacity='1';setTimeout(()=>ld.classList.add('h'),1500)};
+  document.getElementById('bm').disabled=false;
+  document.getElementById('bf').disabled=false;
+}
+
+function a(g){
+  if(cu>=R)return;
+  an[cu].u=g;
+  if(g===po[cu].g)co++;else wr++;
+  document.getElementById('bm').disabled=true;
+  document.getElementById('bf').disabled=true;
+  cu++;
+  setTimeout(sq,300);
+}
+
+function sr(){
+  sp('rp');
+  document.getElementById('fc').textContent=co;
+  document.getElementById('ft').textContent=R;
+  const pct=co/R;
+  let s,msg;
+  if(pct>=.9){s='⭐⭐⭐⭐⭐';msg='🔥 直觉大师！完全猜不透你！'}
+  else if(pct>=.75){s='⭐⭐⭐⭐';msg='👏 观察力惊人！'}
+  else if(pct>=.58){s='⭐⭐⭐';msg='👍 还不错！这些图确实有难度'}
+  else if(pct>=.4){s='⭐⭐';msg='🤔 看来这些照片确实很有迷惑性'}
+  else{s='⭐';msg='😂 太正常了，这些图连AI都可能猜错！'}
+  document.getElementById('fs2').textContent=s;
+  document.getElementById('fm').textContent=msg;
+  const g=document.getElementById('rg');
+  g.innerHTML='';
+  an.forEach((a,i)=>{
+    const p=a.p;
+    const ok=a.u===p.g;
+    const d=document.createElement('div');
+    d.className='ri fi';
+    d.innerHTML=`<img src="${imgPath(p.f)}" alt="${p.n}" loading="lazy"><div class="c"><div class="n">${p.n}</div><div class="a">你猜: ${a.u==='male'?'♂️男生':'♀️女生'} · 实际: ${p.g==='male'?'♂️男生':'♀️女生'}</div></div><div class="ic">${ok?'✅':'❌'}</div>`;
+    d.style.animationDelay=(i*50)+'ms';
+    g.appendChild(d);
+  });
+}
+
+function sp(id){document.querySelectorAll('.pg').forEach(p=>p.classList.remove('a'));document.getElementById(id).classList.add('a')}
+function r(){it()}
+it();
+</script>
+</body>
+</html>
