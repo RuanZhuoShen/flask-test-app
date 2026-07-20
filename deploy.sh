@@ -1,4 +1,4 @@
 #!/bin/bash
-echo "Deploying to /var/www/html..."
-sudo cp index.html /var/www/html/index.html
+echo "Deploying to /etc/nginx/html..."
+sudo cp -n index.html /etc/nginx/html/index.html
 echo "Deploy done!"
